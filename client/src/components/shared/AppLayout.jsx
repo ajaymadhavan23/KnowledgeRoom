@@ -93,7 +93,7 @@ export default function AppLayout() {
           <Avatar user={user} />
           <div>
             <strong>{user.name}</strong>
-            <span className="sidebar-user-role">{user.role === "admin" ? "🛡 Admin" : "Employee"}</span>
+            <span className="sidebar-user-role">{user.role === "admin" ? "Admin" : "Employee"}</span>
           </div>
         </div>
         <button className="ghost full" onClick={handleLogout}>

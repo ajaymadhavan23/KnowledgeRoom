@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Eye } from "lucide-react";
+import { Bookmark, Check, Eye, Heart, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import Avatar from "../shared/Avatar.jsx";
 
@@ -19,7 +19,7 @@ export default function PostCard({ post, onLike, onSave, currentUserId }) {
       <p>{post.excerpt || post.blocks?.[0]?.content || "No excerpt yet."}</p>
       <div className="tag-row">{post.tags?.map((tag) => <span key={tag}>#{tag}</span>)}</div>
       <div className="metric-row">
-        <button className="ghost small" onClick={() => onLike?.(post)}>❤️ {post.likes?.length || post.likesCount || 0}</button>
+        <button className="ghost small" onClick={() => onLike?.(post)}><Heart size={15} /> {post.likes?.length || post.likesCount || 0}</button>
         <span><Eye size={16} /> {post.views?.length || post.viewsCount || 0}</span>
         <span><MessageCircle size={16} /> {post.commentsCount || 0}</span>
         {/* Don't show Save for user's own posts or already-saved posts */}
@@ -27,10 +27,10 @@ export default function PostCard({ post, onLike, onSave, currentUserId }) {
           <span style={{ fontSize: "0.8rem", color: "#647783" }}>Your post</span>
         )}
         {!isOwnPost && !post.hasSaved && (
-          <button className="ghost small" onClick={() => onSave?.(post)}>💾 Save</button>
+          <button className="ghost small" onClick={() => onSave?.(post)}><Bookmark size={15} /> Save</button>
         )}
         {!isOwnPost && post.hasSaved && (
-          <span style={{ fontSize: "0.8rem", color: "#647783" }}>✓ Saved</span>
+          <span className="status-chip"><Check size={14} /> Saved</span>
         )}
       </div>
     </article>

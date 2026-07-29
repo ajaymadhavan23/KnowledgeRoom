@@ -15,23 +15,51 @@
  * - Better placeholder text per block type
  * - Escape closes slash menu without deleting content
  */
+import {
+  Code2,
+  Heading1,
+  Heading2,
+  Image as ImageIcon,
+  Lightbulb,
+  Link as LinkIcon,
+  List,
+  Minus,
+  Pilcrow,
+  Quote,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ─── block type registry ─────────────────────────────────── */
 const BLOCK_TYPES = [
-  { id: "text",     label: "Text",        icon: "¶",    hint: "Plain paragraph",            placeholder: "Type something… or '/' for commands" },
-  { id: "heading",  label: "Heading 1",   icon: "H1",   hint: "Large section heading",       placeholder: "Heading 1" },
-  { id: "heading2", label: "Heading 2",   icon: "H2",   hint: "Medium subheading",           placeholder: "Heading 2" },
-  { id: "list",     label: "Bullet list", icon: "•",    hint: "Unordered list",              placeholder: "List item — one per line" },
-  { id: "code",     label: "Code",        icon: "</>",  hint: "Syntax-highlighted code",     placeholder: "// write code here…" },
-  { id: "image",    label: "Image",       icon: "🖼",   hint: "Image via URL",               placeholder: "https://…" },
-  { id: "link",     label: "Link",        icon: "🔗",   hint: "Hyperlink",                   placeholder: "https://…" },
-  { id: "divider",  label: "Divider",     icon: "─",    hint: "Horizontal rule",             placeholder: "" },
-  { id: "quote",    label: "Quote",       icon: "❝",    hint: "Block quotation",             placeholder: "Quote…" },
-  { id: "callout",  label: "Callout",     icon: "💡",   hint: "Highlighted callout box",     placeholder: "Callout text…" },
+  { id: "text",     label: "Text",        hint: "Plain paragraph",            placeholder: "Type something... or '/' for commands" },
+  { id: "heading",  label: "Heading 1",   hint: "Large section heading",       placeholder: "Heading 1" },
+  { id: "heading2", label: "Heading 2",   hint: "Medium subheading",           placeholder: "Heading 2" },
+  { id: "list",     label: "Bullet list", hint: "Unordered list",              placeholder: "List item - one per line" },
+  { id: "code",     label: "Code",        hint: "Syntax-highlighted code",     placeholder: "// write code here..." },
+  { id: "image",    label: "Image",       hint: "Image via URL",               placeholder: "https://..." },
+  { id: "link",     label: "Link",        hint: "Hyperlink",                   placeholder: "https://..." },
+  { id: "divider",  label: "Divider",     hint: "Horizontal rule",             placeholder: "" },
+  { id: "quote",    label: "Quote",       hint: "Block quotation",             placeholder: "Quote..." },
+  { id: "callout",  label: "Callout",     hint: "Highlighted callout box",     placeholder: "Callout text..." },
 ];
 
 const TYPE_MAP = Object.fromEntries(BLOCK_TYPES.map((t) => [t.id, t]));
+
+function BlockTypeIcon({ type, size = 15 }) {
+  const icons = {
+    text: <Pilcrow size={size} />,
+    heading: <Heading1 size={size} />,
+    heading2: <Heading2 size={size} />,
+    list: <List size={size} />,
+    code: <Code2 size={size} />,
+    image: <ImageIcon size={size} />,
+    link: <LinkIcon size={size} />,
+    divider: <Minus size={size} />,
+    quote: <Quote size={size} />,
+    callout: <Lightbulb size={size} />,
+  };
+  return icons[type] || icons.text;
+}
 
 const LANGUAGES = [
   "javascript","typescript","python","html","css","sql","bash","json",
@@ -299,7 +327,7 @@ export default function NotionEditor({ blocks: initBlocks, onChange }) {
                 setSlashMenu(null);
               }}
             >
-              {TYPE_MAP[block.type]?.icon || "¶"}
+              <BlockTypeIcon type={block.type} />
             </button>
           </div>
 
@@ -408,7 +436,7 @@ function BlockInput({ block, index, inputRefs, onKeyDown, onChange, onUpdate }) 
   if (block.type === "callout") {
     return (
       <div className="ne-callout-wrap">
-        <span className="ne-callout-icon">💡</span>
+        <span className="ne-callout-icon"><Lightbulb size={18} /></span>
         <textarea {...shared} className="ne-input ne-callout-text" rows={1} />
       </div>
     );
@@ -441,7 +469,7 @@ function BlockInput({ block, index, inputRefs, onKeyDown, onChange, onUpdate }) 
     return (
       <div className="ne-image-wrap">
         <div className="ne-url-row">
-          <span className="ne-url-icon">🖼</span>
+          <span className="ne-url-icon"><ImageIcon size={18} /></span>
           <input
             ref={(el) => { if (el) inputRefs.current[block._tid] = el; }}
             className="ne-url-input"
@@ -476,7 +504,7 @@ function BlockInput({ block, index, inputRefs, onKeyDown, onChange, onUpdate }) 
     return (
       <div className="ne-link-wrap">
         <div className="ne-url-row">
-          <span className="ne-url-icon">🔗</span>
+          <span className="ne-url-icon"><LinkIcon size={18} /></span>
           <input
             ref={(el) => { if (el) inputRefs.current[block._tid] = el; }}
             className="ne-url-input"
@@ -501,7 +529,7 @@ function BlockInput({ block, index, inputRefs, onKeyDown, onChange, onUpdate }) 
               target="_blank"
               rel="noreferrer"
             >
-              <span className="ne-link-preview-icon">🔗</span>
+              <span className="ne-link-preview-icon"><LinkIcon size={17} /></span>
               {block.meta?.label || block.content}
             </a>
           </>
@@ -552,7 +580,7 @@ function SlashMenu({ commands, onSelect, onClose, title = "Turn into" }) {
           onMouseDown={(e) => { e.preventDefault(); onSelect(cmd.id); }}
           onMouseEnter={() => setActiveIdx(i)}
         >
-          <span className="ne-slash-icon">{cmd.icon}</span>
+          <span className="ne-slash-icon"><BlockTypeIcon type={cmd.id} /></span>
           <div>
             <div className="ne-slash-label">{cmd.label}</div>
             <div className="ne-slash-hint">{cmd.hint}</div>

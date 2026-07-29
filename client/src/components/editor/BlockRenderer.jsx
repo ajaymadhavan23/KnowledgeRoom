@@ -1,4 +1,5 @@
 import Prism from "prismjs";
+import { Lightbulb, Link as LinkIcon } from "lucide-react";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-python";
@@ -47,7 +48,7 @@ export default function BlockRenderer({ blocks = [] }) {
         if (block.type === "callout")
           return (
             <div key={key} className="rendered-callout">
-              <span className="rendered-callout-icon">💡</span>
+              <span className="rendered-callout-icon"><Lightbulb size={18} /></span>
               <span>{block.content}</span>
             </div>
           );
@@ -65,7 +66,7 @@ export default function BlockRenderer({ blocks = [] }) {
         if (block.type === "link")
           return (
             <a key={key} className="rendered-link" href={block.content} target="_blank" rel="noreferrer">
-              <span className="rendered-link-icon">🔗</span>
+              <span className="rendered-link-icon"><LinkIcon size={17} /></span>
               {block.meta?.label || block.meta?.title || block.content}
             </a>
           );

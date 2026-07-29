@@ -933,6 +933,11 @@ img.avatar { object-fit: cover; }
 
 /* ── Form validation ── */
 .field-wrap { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.field-wrap label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 750;
+}
 .field-error {
   color: #dc2626;
   font-size: 0.8rem;
@@ -1435,6 +1440,28 @@ h3 {
 .author-row a {
   color: var(--text);
   font-weight: 850;
+}
+
+.inline-stat,
+.adm-mini-stats,
+.adm-card-title,
+.adm-section-title {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.inline-stat svg,
+.adm-mini-stats svg,
+.adm-card-title svg,
+.adm-section-title svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.adm-mini-stats {
+  color: #94a3b8;
+  font-size: 0.78rem;
 }
 
 .notification {

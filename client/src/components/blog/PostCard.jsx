@@ -24,7 +24,7 @@ export default function PostCard({ post, onLike, onSave, currentUserId }) {
         <span><MessageCircle size={16} /> {post.commentsCount || 0}</span>
         {/* Don't show Save for user's own posts or already-saved posts */}
         {isOwnPost && (
-          <span style={{ fontSize: "0.8rem", color: "#647783" }}>Your post</span>
+          <span className="status-chip">Your post</span>
         )}
         {!isOwnPost && !post.hasSaved && (
           <button className="ghost small" onClick={() => onSave?.(post)}><Bookmark size={15} /> Save</button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import ItemCard from "../components/space/ItemCard.jsx";
@@ -21,7 +22,7 @@ export default function FolderPage() {
   return (
     <>
       <PageHeader eyebrow="Folder" title="Folder view">
-        <button className="ghost" onClick={() => navigate(-1)}>← Back</button>
+        <button className="ghost" onClick={() => navigate(-1)}><ArrowLeft size={16} /> Back</button>
         <Link className="button" to={`/items/new?folder=${folderId}`}>New item here</Link>
       </PageHeader>
       <div className="grid-list">{items.map((item) => <ItemCard key={item._id} item={item} onDelete={remove} />)}</div>

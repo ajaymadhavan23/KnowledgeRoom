@@ -1,5 +1,17 @@
 import { useEffect, useState } from "react";
 import {
+  BarChart3,
+  Building2,
+  CalendarDays,
+  Eye,
+  FileText,
+  FolderOpen,
+  Heart,
+  MessageCircle,
+  Trophy,
+  Users,
+} from "lucide-react";
+import {
   Bar,
   BarChart,
   CartesianGrid,
@@ -133,17 +145,17 @@ export default function AdminDashboardPage() {
 
       {/* ── KPI strip ── */}
       <div className="adm-kpi-grid">
-        <KPI label="Total Users"    value={stats?.totalUsers}    icon="👥" color={TEAL}   />
-        <KPI label="Published Posts" value={stats?.totalPosts}   icon="📝" color={INDIGO} />
-        <KPI label="Space Items"    value={stats?.totalItems}    icon="🗂️"  color={AMBER}  />
-        <KPI label="Comments"       value={stats?.totalComments} icon="💬" color={ROSE}   />
+        <KPI label="Total Users"    value={stats?.totalUsers}    icon={<Users size={24} />} color={TEAL}   />
+        <KPI label="Published Posts" value={stats?.totalPosts}   icon={<FileText size={24} />} color={INDIGO} />
+        <KPI label="Space Items"    value={stats?.totalItems}    icon={<FolderOpen size={24} />}  color={AMBER}  />
+        <KPI label="Comments"       value={stats?.totalComments} icon={<MessageCircle size={24} />} color={ROSE}   />
       </div>
 
       {/* ── charts grid ── */}
       <div className="adm-grid">
 
         {/* 1. Posts published over time */}
-        <Card title="📅 Posts Published — Last 14 Days" span={2}>
+        <Card title={<><CalendarDays size={17} /> Posts Published - Last 14 Days</>} span={2}>
           {postsPerDayData.length === 0 ? (
             <p className="adm-empty">No posts in the last 14 days.</p>
           ) : (
@@ -160,7 +172,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* 2. Pie: posts by department */}
-        <Card title="🏢 Posts by Department">
+        <Card title={<><Building2 size={17} /> Posts by Department</>}>
           {deptData.length === 0 ? (
             <p className="adm-empty">No data yet.</p>
           ) : (
@@ -187,7 +199,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* 3. Top 5 most viewed posts */}
-        <Card title="👁 Top 5 Most Viewed Posts" span={2}>
+        <Card title={<><Eye size={17} /> Top 5 Most Viewed Posts</>} span={2}>
           {topViewedData.length === 0 ? (
             <p className="adm-empty">No views recorded yet.</p>
           ) : (
@@ -204,7 +216,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* 4. Top 5 most liked posts */}
-        <Card title="❤️ Top 5 Most Liked Posts">
+        <Card title={<><Heart size={17} /> Top 5 Most Liked Posts</>}>
           {topLikedData.length === 0 ? (
             <p className="adm-empty">No likes yet.</p>
           ) : (
@@ -221,7 +233,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* 5. Most active users — grouped bar */}
-        <Card title="🏆 Most Active Users (Posts · Likes · Views)" span={3}>
+        <Card title={<><Trophy size={17} /> Most Active Users (Posts - Likes - Views)</>} span={3}>
           {activeUsersData.length === 0 ? (
             <p className="adm-empty">No data yet.</p>
           ) : (
@@ -242,7 +254,7 @@ export default function AdminDashboardPage() {
 
         {/* 6. Department engagement table */}
         {deptData.length > 0 && (
-          <Card title="📊 Department Engagement Breakdown" span={3}>
+          <Card title={<><BarChart3 size={17} /> Department Engagement Breakdown</>} span={3}>
             <div className="adm-table-wrap">
               <table className="adm-table">
                 <thead>
@@ -272,15 +284,15 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* ── All posts moderation table ── */}
-      <h2 className="adm-section-title">🗂 All Posts — Moderation</h2>
+      <h2 className="adm-section-title"><FolderOpen size={19} /> All Posts - Moderation</h2>
       <section className="table-list">
         {posts.map((post) => (
           <article className="table-row" key={post._id}>
             <div>
               <h3>{post.title}</h3>
               <p>{post.author?.name} · {post.author?.department}</p>
-              <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>
-                👁 {post.views?.length ?? 0} &nbsp;❤️ {post.likes?.length ?? 0}
+              <p className="adm-mini-stats">
+                <Eye size={13} /> {post.views?.length ?? 0} <Heart size={13} /> {post.likes?.length ?? 0}
               </p>
             </div>
             <span className={`adm-status ${post.isActive ? "active" : "inactive"}`}>

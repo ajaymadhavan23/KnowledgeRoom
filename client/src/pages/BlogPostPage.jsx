@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArrowLeft, Bookmark, Check, Eye, Heart } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import CommentThread from "../components/blog/CommentThread.jsx";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
@@ -53,16 +54,16 @@ export default function BlogPostPage() {
   return (
     <>
       <PageHeader eyebrow="Blog post" title={post.title}>
-        <button className="ghost" onClick={() => navigate(-1)}>← Back</button>
-        <button className="ghost" onClick={like}>❤️ {post.likes?.length || 0}</button>
+        <button className="ghost" onClick={() => navigate(-1)}><ArrowLeft size={16} /> Back</button>
+        <button className="ghost" onClick={like}><Heart size={16} /> {post.likes?.length || 0}</button>
         {/* Hide Save button for own post or if already saved */}
         {!isOwnPost && !hasSaved && (
           <button onClick={save} disabled={saving}>
-            {saving ? "Saving…" : "Save to My Space"}
+            {saving ? "Saving..." : <><Bookmark size={16} /> Save to My Space</>}
           </button>
         )}
         {!isOwnPost && hasSaved && (
-          <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>✓ Saved</span>
+          <span className="status-chip"><Check size={14} /> Saved</span>
         )}
       </PageHeader>
 
@@ -73,7 +74,7 @@ export default function BlogPostPage() {
           <Avatar user={post.author} />
           <div>
             <Link to={`/profile/${post.author?._id}`}>{post.author?.name}</Link>
-            <span>{post.author?.department} · 👁 {viewsCount !== null ? `${viewsCount} unique views` : "…"}</span>
+            <span className="inline-stat">{post.author?.department} <Eye size={14} /> {viewsCount !== null ? `${viewsCount} unique views` : "..."}</span>
           </div>
         </div>
         <p className="lead">{post.excerpt}</p>

@@ -53,24 +53,24 @@ export default function SettingsPage() {
       <PageHeader eyebrow="Account" title="Settings & Profile" />
       <form className="panel settings-form" onSubmit={submit} noValidate>
         <div className="field-wrap">
-          <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#64748b" }}>Full Name</label>
+          <label>Full Name</label>
           <input placeholder="Name" {...field("name")} />
           {errors.name && <span className="field-error">{errors.name}</span>}
         </div>
 
         <div className="field-wrap">
-          <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#64748b" }}>Department</label>
+          <label>Department</label>
           <input placeholder="Department" {...field("department")} />
           {errors.department && <span className="field-error">{errors.department}</span>}
         </div>
 
         <div className="field-wrap">
-          <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#64748b" }}>Avatar URL</label>
+          <label>Avatar URL</label>
           <input placeholder="Avatar URL (optional)" {...field("avatarUrl")} />
         </div>
 
         <div className="field-wrap">
-          <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#64748b" }}>Bio</label>
+          <label>Bio</label>
           <textarea rows="4" placeholder="Short bio..." {...field("bio")} />
         </div>
 

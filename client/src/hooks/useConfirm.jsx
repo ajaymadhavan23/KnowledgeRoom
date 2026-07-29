@@ -6,6 +6,7 @@
  *   // In JSX: {confirmDialog}
  *   // On action: const ok = await confirm({ title, message, confirmText, danger });
  */
+import { AlertTriangle, CircleHelp } from "lucide-react";
 import { useRef, useState } from "react";
 
 export function useConfirm() {
@@ -47,7 +48,7 @@ export function ConfirmModal({ title, message, confirmText, danger = false, onCo
     <div className="modal-backdrop" onMouseDown={onCancel}>
       <div className="modal-box" onMouseDown={(e) => e.stopPropagation()}>
         <div className={`modal-icon ${danger ? "modal-icon-danger" : "modal-icon-info"}`}>
-          {danger ? "⚠️" : "❓"}
+          {danger ? <AlertTriangle size={26} /> : <CircleHelp size={26} />}
         </div>
         <h3 className="modal-title">{title}</h3>
         {message && <p className="modal-message">{message}</p>}

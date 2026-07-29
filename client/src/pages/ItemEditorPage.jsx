@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket } from "lucide-react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import NotionEditor from "../components/editor/NotionEditor.jsx";
@@ -128,11 +129,11 @@ export default function ItemEditorPage() {
       />
       <div className="nt-pub-actions">
         <span className="nt-pub-hint">
-          📝 Publishing creates a <strong>public copy</strong>. Your private note stays independent.
+          <FileText size={15} /> Publishing creates a <strong>public copy</strong>. Your private note stays independent.
         </span>
         {item.publishedPostId && (
           <Link to={`/blog/${item.publishedPostId}`} className="nt-btn-ghost" target="_blank">
-            View published post ↗
+            View published post <ExternalLink size={14} />
           </Link>
         )}
         <button
@@ -140,7 +141,7 @@ export default function ItemEditorPage() {
           onClick={publish}
           disabled={publishing || saving}
         >
-          {publishing ? "Publishing…" : "🚀 Publish to Blog"}
+          {publishing ? "Publishing..." : <><Rocket size={16} /> Publish to Blog</>}
         </button>
       </div>
     </div>
@@ -153,15 +154,15 @@ export default function ItemEditorPage() {
     return (
       <div className="notion-page">
         <div className="notion-topbar">
-          <button className="nt-back-btn" onClick={() => navigate(-1)}>← Back</button>
+          <button className="nt-back-btn" onClick={() => navigate(-1)}><ArrowLeft size={16} /> Back</button>
           <div className="nt-actions">
             {StatusBar}
-            <button className="nt-btn-ghost" onClick={() => setPreview(false)}>✏️ Edit</button>
+            <button className="nt-btn-ghost" onClick={() => setPreview(false)}><Edit3 size={16} /> Edit</button>
             <button
               className={`nt-btn-ghost ${showPublishPanel ? "nt-btn-active" : ""}`}
               onClick={() => setShowPublishPanel((s) => !s)}
             >
-              {item.isPublished ? "📤 Re-publish" : "🚀 Publish"}
+              {item.isPublished ? <><Rocket size={16} /> Re-publish</> : <><Rocket size={16} /> Publish</>}
             </button>
           </div>
         </div>
@@ -180,7 +181,7 @@ export default function ItemEditorPage() {
           {/* Attribution banner — shown on items saved from the community blog */}
           {item.sourcePost?.author && (
             <div className="saved-from-banner">
-              <span className="saved-from-icon">🔖</span>
+              <span className="saved-from-icon"><Bookmark size={16} /></span>
               <span>
                 Originally published by{" "}
                 <strong>{item.sourcePost.author.name}</strong>
@@ -208,7 +209,7 @@ export default function ItemEditorPage() {
           className="nt-back-btn"
           onClick={() => { if (id) setPreview(true); else navigate(-1); }}
         >
-          ← {id ? "Cancel" : "Back"}
+          <ArrowLeft size={16} /> {id ? "Cancel" : "Back"}
         </button>
         <div className="nt-actions">
           {StatusBar}
@@ -216,14 +217,14 @@ export default function ItemEditorPage() {
             className={`nt-btn-ghost ${showPublishPanel ? "nt-btn-active" : ""}`}
             onClick={() => setShowPublishPanel((s) => !s)}
           >
-            {item.isPublished ? "📤 Re-publish" : "🚀 Publish"}
+            {item.isPublished ? <><Rocket size={16} /> Re-publish</> : <><Rocket size={16} /> Publish</>}
           </button>
           <button
             className="nt-btn-primary"
             onClick={() => save()}
             disabled={saving || publishing}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

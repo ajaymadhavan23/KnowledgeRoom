@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getErrorMessage } from "../services/api.js";
@@ -54,7 +55,7 @@ export default function LoginPage() {
         <h1>Welcome back</h1>
 
         {serverError && (
-          <div className="form-error-banner">⚠️ {serverError}</div>
+          <div className="form-error-banner"><AlertTriangle size={16} /> {serverError}</div>
         )}
 
         <div className="field-wrap">

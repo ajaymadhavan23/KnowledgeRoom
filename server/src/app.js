@@ -33,8 +33,23 @@ app.use(async (_req, _res, next) => {
   }
 });
 
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", message: "Knowledge Room API is running on Vercel Serverless" });
+app.get("/api/health", async (_req, res) => {
+  try {
+    await connectDB();
+    res.json({
+      status: "ok",
+      db: "connected",
+      hasMongoUri: Boolean(process.env.MONGODB_URI),
+      hasJwtSecret: Boolean(process.env.JWT_ACCESS_SECRET),
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+      hasMongoUri: Boolean(process.env.MONGODB_URI),
+      hasJwtSecret: Boolean(process.env.JWT_ACCESS_SECRET),
+    });
+  }
 });
 
 app.use("/api/auth", authRoutes);

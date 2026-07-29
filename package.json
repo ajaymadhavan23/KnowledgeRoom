@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd client && npm install && npm run build",
+    "build": "cd server && npm install && cd ../client && npm install && npm run build",
     "dev": "concurrently \"npm.cmd run dev --prefix server\" \"npm.cmd run dev --prefix client\"",
     "install:all": "npm.cmd install && npm.cmd install --prefix server && npm.cmd install --prefix client"
   },

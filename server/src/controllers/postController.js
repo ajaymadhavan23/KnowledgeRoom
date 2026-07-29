@@ -38,7 +38,11 @@ export async function getPosts(req, res, next) {
     const postIds = posts.map((p) => p._id);
     const savedItems = await Item.find({ owner: userId, sourcePost: { $in: postIds } }, "sourcePost");
     const savedSet = new Set(savedItems.map((item) => item.sourcePost.toString()));
-    const postsWithSaved = posts.map((p) => ({ ...p, hasSaved: savedSet.has(p._id.toString()) }));
+    const postsWithSaved = posts.map((p) => ({
+      ...p,
+      hasLiked: p.likes?.some((id) => id.toString() === userId.toString()),
+      hasSaved: savedSet.has(p._id.toString())
+    }));
 
     res.json(postsWithSaved);
   } catch (error) {

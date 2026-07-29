@@ -19,8 +19,19 @@ export default function BlogFeedPage() {
   }, [sort, tag]);
 
   async function handleLike(post) {
-    const result = await likePost(post._id);
-    setPosts((current) => current.map((row) => row._id === post._id ? { ...row, likes: Array(result.likesCount).fill("x") } : row));
+    try {
+      const result = await likePost(post._id);
+      setPosts((current) =>
+        current.map((row) =>
+          row._id === post._id
+            ? { ...row, hasLiked: result.liked, likesCount: result.likesCount }
+            : row
+        )
+      );
+      setMessage("");
+    } catch (err) {
+      setMessage(getErrorMessage(err));
+    }
   }
 
   async function handleSave(post) {

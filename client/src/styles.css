@@ -1386,6 +1386,12 @@ h3 {
   padding: 6px 10px;
 }
 
+.like-button.liked {
+  background: rgba(20, 184, 166, 0.14);
+  border-color: rgba(20, 184, 166, 0.34);
+  color: var(--primary);
+}
+
 .tree {
   gap: 8px;
 }

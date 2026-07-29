@@ -5,6 +5,10 @@ import Avatar from "../shared/Avatar.jsx";
 export default function PostCard({ post, onLike, onSave, currentUserId }) {
   const isOwnPost = currentUserId && post.author &&
     (post.author._id === currentUserId || post.author._id?.toString() === currentUserId?.toString());
+  const hasLiked = post.hasLiked ?? Boolean(
+    post.likes?.some((id) => id?._id === currentUserId || id?.toString() === currentUserId?.toString())
+  );
+  const likesCount = post.likesCount ?? post.likes?.length ?? 0;
 
   return (
     <article className="post-card">
@@ -19,7 +23,14 @@ export default function PostCard({ post, onLike, onSave, currentUserId }) {
       <p>{post.excerpt || post.blocks?.[0]?.content || "No excerpt yet."}</p>
       <div className="tag-row">{post.tags?.map((tag) => <span key={tag}>#{tag}</span>)}</div>
       <div className="metric-row">
-        <button className="ghost small" onClick={() => onLike?.(post)}><Heart size={15} /> {post.likes?.length || post.likesCount || 0}</button>
+        <button
+          className={`ghost small like-button ${hasLiked ? "liked" : ""}`}
+          onClick={() => onLike?.(post)}
+          aria-pressed={hasLiked}
+          aria-label={hasLiked ? "Unlike post" : "Like post"}
+        >
+          <Heart size={15} fill={hasLiked ? "currentColor" : "none"} /> {likesCount}
+        </button>
         <span><Eye size={16} /> {post.views?.length || post.viewsCount || 0}</span>
         <span><MessageCircle size={16} /> {post.commentsCount || 0}</span>
         {/* Don't show Save for user's own posts or already-saved posts */}

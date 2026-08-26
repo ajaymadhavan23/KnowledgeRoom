@@ -26,6 +26,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import { useConfirm } from "../hooks/useConfirm.jsx";
 import { deactivatePost, fetchAdminPosts, fetchAdminStats } from "../services/adminService.js";
@@ -85,16 +86,23 @@ export default function AdminDashboardPage() {
   const [stats, setStats]   = useState(null);
   const [posts, setPosts]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
   const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => { refresh(); }, []);
 
   async function refresh() {
-    setLoading(true);
-    const [nextStats, nextPosts] = await Promise.all([fetchAdminStats(), fetchAdminPosts()]);
-    setStats(nextStats);
-    setPosts(nextPosts);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [nextStats, nextPosts] = await Promise.all([fetchAdminStats(), fetchAdminPosts()]);
+      setStats(nextStats);
+      setPosts(nextPosts);
+      setMessage("");
+    } catch (err) {
+      setMessage(err?.response?.data?.message || "Could not load analytics.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function deactivate(id, title) {
@@ -108,7 +116,8 @@ export default function AdminDashboardPage() {
     refresh();
   }
 
-  if (loading) return <p className="muted" style={{ padding: 32 }}>Loading analytics…</p>;
+  if (loading) return <LoadingState label="Loading analytics..." />;
+  if (message) return <p className="error">{message}</p>;
 
   /* ── derived chart data ── */
   const topViewedData = (stats?.topViewedPosts ?? []).map((p) => ({

@@ -49,6 +49,26 @@ h3 { font-size: 1.05rem; margin-bottom: 8px; }
   padding: 24px;
   place-items: center;
 }
+
+.loading-state {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(20, 184, 166, 0.16);
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06);
+  color: #31524d;
+  display: flex;
+  font-weight: 800;
+  gap: 10px;
+  justify-content: center;
+  margin: 18px 0;
+  min-height: 140px;
+  padding: 24px;
+}
+
+.loading-spinner {
+  animation: spin 0.85s linear infinite;
+}
 .auth-panel {
   background: white;
   border: 1px solid #d7e0e5;
@@ -1851,6 +1871,16 @@ h3 {
 
   .comment-form {
     grid-template-columns: 1fr;
+  }
+
+  .ai-draft-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ai-draft-bar .nt-btn-primary {
+    justify-content: center;
+    width: 100%;
   }
 }
 

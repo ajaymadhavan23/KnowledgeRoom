@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 import { Bell, Bookmark, CheckCircle2, Heart, MessageCircle, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import { fetchNotifications, markNotificationRead } from "../services/notificationService.js";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetchNotifications().then(setNotifications);
+    let active = true;
+    setLoading(true);
+    fetchNotifications()
+      .then((data) => { if (active) setNotifications(data); })
+      .catch((err) => { if (active) setMessage(err?.response?.data?.message || "Could not load notifications."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, []);
 
   async function mark(id) {
@@ -33,6 +42,8 @@ export default function NotificationsPage() {
           <button className="ghost small" onClick={markAll}>Mark all read</button>
         )}
       </PageHeader>
+      {message && <p className="error">{message}</p>}
+      {loading && <LoadingState label="Loading notifications..." />}
       <div className="feed-list">
         {notifications.map((note) => (
           <article className={`notification ${note.isRead ? "" : "unread"}`} key={note._id}>
@@ -58,7 +69,7 @@ export default function NotificationsPage() {
           </article>
         ))}
       </div>
-      {!notifications.length && (
+      {!loading && !notifications.length && (
         <div className="empty-state">
           <Bell size={34} />
           <strong>All caught up</strong>

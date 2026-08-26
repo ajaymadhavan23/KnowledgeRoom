@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PostCard from "../components/blog/PostCard.jsx";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
-import SearchBar from "../components/shared/SearchBar.jsx";
 import TagFilter from "../components/shared/TagFilter.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getErrorMessage } from "../services/api.js";
@@ -13,9 +13,16 @@ export default function BlogFeedPage() {
   const [sort, setSort] = useState("latest");
   const [tag, setTag] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts({ sort, tag }).then(setPosts);
+    let active = true;
+    setLoading(true);
+    fetchPosts({ sort, tag })
+      .then((data) => { if (active) setPosts(data); })
+      .catch((err) => { if (active) setMessage(getErrorMessage(err)); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [sort, tag]);
 
   async function handleLike(post) {
@@ -64,18 +71,24 @@ export default function BlogFeedPage() {
         </div>
       </div>
       {message && <p className={message.includes("✓") ? "success" : "error"}>{message}</p>}
-      <div className="feed-list">
-        {posts.map((post) => (
-          <PostCard
-            key={post._id}
-            post={post}
-            onLike={handleLike}
-            onSave={handleSave}
-            currentUserId={user?._id}
-          />
-        ))}
-      </div>
-      {!posts.length && <p className="muted">No public posts yet. Publish an item from your space.</p>}
+      {loading ? (
+        <LoadingState label="Loading blog posts..." />
+      ) : (
+        <>
+          <div className="feed-list">
+            {posts.map((post) => (
+              <PostCard
+                key={post._id}
+                post={post}
+                onLike={handleLike}
+                onSave={handleSave}
+                currentUserId={user?._id}
+              />
+            ))}
+          </div>
+          {!posts.length && <p className="muted">No public posts yet. Publish an item from your space.</p>}
+        </>
+      )}
     </>
   );
 }

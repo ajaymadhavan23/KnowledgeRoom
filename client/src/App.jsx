@@ -16,10 +16,11 @@ import SignupPage from "./pages/SignupPage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
 import SavedPage from "./pages/SavedPage.jsx";
 import AppLayout from "./components/shared/AppLayout.jsx";
+import LoadingState from "./components/shared/LoadingState.jsx";
 
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, booting, isAdmin } = useAuth();
-  if (booting) return <div className="loading-screen">Loading Knowledge Room...</div>;
+  if (booting) return <LoadingState label="Loading Knowledge Room..." fullScreen />;
   if (!user) return <Navigate to="/login" replace />;
   if (adminOnly && !isAdmin) return <Navigate to="/space" replace />;
   return children;
@@ -27,7 +28,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
 
 function PublicOnly({ children }) {
   const { user, booting } = useAuth();
-  if (booting) return <div className="loading-screen">Loading Knowledge Room...</div>;
+  if (booting) return <LoadingState label="Loading Knowledge Room..." fullScreen />;
   return user ? <Navigate to="/space" replace /> : children;
 }
 

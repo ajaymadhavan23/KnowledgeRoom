@@ -3,15 +3,24 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useConfirm } from "../../hooks/useConfirm.jsx";
 import { createComment, deleteComment, fetchComments } from "../../services/postService.js";
 import Avatar from "../shared/Avatar.jsx";
+import LoadingState from "../shared/LoadingState.jsx";
 
 export default function CommentThread({ postId }) {
   const { user, isAdmin } = useAuth();
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
   const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => {
-    fetchComments(postId).then(setComments);
+    let active = true;
+    setLoading(true);
+    fetchComments(postId)
+      .then((data) => { if (active) setComments(data); })
+      .catch((err) => { if (active) setMessage(err?.response?.data?.message || "Could not load comments."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [postId]);
 
   async function submit(event) {
@@ -40,6 +49,8 @@ export default function CommentThread({ postId }) {
         <input value={text} onChange={(event) => setText(event.target.value)} placeholder="Add a comment" />
         <button>Post</button>
       </form>
+      {message && <p className="error">{message}</p>}
+      {loading && <LoadingState label="Loading comments..." />}
       {comments.map((comment) => (
         <article className="comment" key={comment._id}>
           <Avatar user={comment.author} size="sm" />

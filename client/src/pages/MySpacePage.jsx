@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import FolderTree from "../components/space/FolderTree.jsx";
 import ItemCard from "../components/space/ItemCard.jsx";
@@ -10,15 +11,25 @@ export default function MySpacePage() {
   const [folders, setFolders] = useState({ tree: [], folders: [] });
   const [items, setItems] = useState([]);
   const [folderName, setFolderName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     refresh();
   }, []);
 
   async function refresh() {
-    const [folderData, recent] = await Promise.all([fetchFolders(), fetchRecentItems()]);
-    setFolders(folderData);
-    setItems(recent);
+    try {
+      setLoading(true);
+      const [folderData, recent] = await Promise.all([fetchFolders(), fetchRecentItems()]);
+      setFolders(folderData);
+      setItems(recent);
+      setMessage("");
+    } catch (err) {
+      setMessage(err?.response?.data?.message || "Could not load your space.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function addFolder(event) {
@@ -39,6 +50,10 @@ export default function MySpacePage() {
       <PageHeader eyebrow="Private workspace" title="My Space">
         <Link className="button" to="/items/new">New item</Link>
       </PageHeader>
+      {message && <p className="error">{message}</p>}
+      {loading ? (
+        <LoadingState label="Loading your space..." />
+      ) : (
       <div className="two-column">
         <section className="panel">
           <h2>Folders</h2>
@@ -53,6 +68,7 @@ export default function MySpacePage() {
           <div className="grid-list">{items.map((item) => <ItemCard key={item._id} item={item} onDelete={removeItem} />)}</div>
         </section>
       </div>
+      )}
     </>
   );
 }

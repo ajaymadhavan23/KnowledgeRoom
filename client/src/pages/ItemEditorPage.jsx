@@ -3,6 +3,7 @@ import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket, Sparkles } 
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import NotionEditor from "../components/editor/NotionEditor.jsx";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import { generateBlogDraft } from "../services/aiService.js";
 import { getErrorMessage } from "../services/api.js";
 import { createItem, fetchItem, publishItem, updateItem } from "../services/itemService.js";
@@ -28,19 +29,25 @@ export default function ItemEditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [editorVersion, setEditorVersion] = useState(0);
+  const [loading, setLoading] = useState(Boolean(id));
 
   useEffect(() => {
     if (id) {
-      fetchItem(id).then((data) => {
-        setItem(data);
-        setExcerpt("");
-        setEditorVersion((version) => version + 1);
-      });
+      setLoading(true);
+      fetchItem(id)
+        .then((data) => {
+          setItem(data);
+          setExcerpt("");
+          setEditorVersion((version) => version + 1);
+        })
+        .catch((err) => flash(getErrorMessage(err), "error"))
+        .finally(() => setLoading(false));
       setPreview(true);
     } else {
       setItem({ ...blank, folder: searchParams.get("folder") || null });
       setEditorVersion((version) => version + 1);
       setPreview(false);
+      setLoading(false);
     }
   }, [id, searchParams]);
 
@@ -185,6 +192,8 @@ export default function ItemEditorPage() {
       </div>
     </div>
   ) : null;
+
+  if (loading) return <LoadingState label="Loading note..." />;
 
   /* ════════════════════════════════════════════════════════
      PREVIEW MODE

@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import CommentThread from "../components/blog/CommentThread.jsx";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import Avatar from "../components/shared/Avatar.jsx";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { fetchPost, likePost, savePost, viewPost } from "../services/postService.js";
@@ -17,16 +18,25 @@ export default function BlogPostPage() {
   const [hasSaved, setHasSaved] = useState(false);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
     // Fetch post content and register the view concurrently.
     // viewsCount is driven exclusively by the viewPost response (post-write),
     // which is the accurate unique-viewer count after the atomic $addToSet.
     Promise.all([fetchPost(id), viewPost(id)]).then(([p, result]) => {
+      if (!active) return;
       setPost(p);
       setHasSaved(!!p.hasSaved);
       if (result?.viewsCount !== undefined) setViewsCount(result.viewsCount);
+    }).catch((err) => {
+      if (active) setMessage(err?.response?.data?.message || "Could not load post.");
+    }).finally(() => {
+      if (active) setLoading(false);
     });
+    return () => { active = false; };
   }, [id]);
 
   async function like() {
@@ -47,7 +57,8 @@ export default function BlogPostPage() {
     }
   }
 
-  if (!post) return <p className="muted">Loading post...</p>;
+  if (loading) return <LoadingState label="Loading post..." />;
+  if (!post) return <p className="error">{message || "Post not found."}</p>;
 
   const isOwnPost = user && post.author && (post.author._id === user._id || post.author._id?.toString() === user._id?.toString());
 

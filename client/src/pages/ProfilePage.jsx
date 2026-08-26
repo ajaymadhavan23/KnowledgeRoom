@@ -2,18 +2,28 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PostCard from "../components/blog/PostCard.jsx";
 import Avatar from "../components/shared/Avatar.jsx";
+import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import { fetchUserProfile } from "../services/userService.js";
 
 export default function ProfilePage() {
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetchUserProfile(id).then(setProfile);
+    let active = true;
+    setLoading(true);
+    fetchUserProfile(id)
+      .then((data) => { if (active) setProfile(data); })
+      .catch((err) => { if (active) setMessage(err?.response?.data?.message || "Could not load profile."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [id]);
 
-  if (!profile) return <p className="muted">Loading profile...</p>;
+  if (loading) return <LoadingState label="Loading profile..." />;
+  if (!profile) return <p className="error">{message || "Profile not found."}</p>;
 
   return (
     <>

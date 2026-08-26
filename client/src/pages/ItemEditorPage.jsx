@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket } from "lucide-react";
+import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket, Sparkles } from "lucide-react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import NotionEditor from "../components/editor/NotionEditor.jsx";
+import { generateBlogDraft } from "../services/aiService.js";
+import { getErrorMessage } from "../services/api.js";
 import { createItem, fetchItem, publishItem, updateItem } from "../services/itemService.js";
 
 const blank = {
@@ -24,13 +26,20 @@ export default function ItemEditorPage() {
   const [status, setStatus] = useState({ msg: "", type: "" }); // { msg, type: 'success'|'error'|'' }
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [editorVersion, setEditorVersion] = useState(0);
 
   useEffect(() => {
     if (id) {
-      fetchItem(id).then((data) => { setItem(data); setExcerpt(""); });
+      fetchItem(id).then((data) => {
+        setItem(data);
+        setExcerpt("");
+        setEditorVersion((version) => version + 1);
+      });
       setPreview(true);
     } else {
       setItem({ ...blank, folder: searchParams.get("folder") || null });
+      setEditorVersion((version) => version + 1);
       setPreview(false);
     }
   }, [id, searchParams]);
@@ -110,6 +119,36 @@ export default function ItemEditorPage() {
   }
 
   /* ── shared status bar ── */
+  async function generateDraft() {
+    const topic = item.title?.trim();
+    if (!topic || topic.toLowerCase() === "untitled") {
+      flash("Type a heading first, then generate the draft", "error");
+      return;
+    }
+
+    const hasUserContent = item.blocks?.some((block) => block.content?.trim());
+    if (hasUserContent && !window.confirm("Replace the current draft with an AI-generated one?")) return;
+
+    setGenerating(true);
+    try {
+      const draft = await generateBlogDraft({ topic });
+      setItem((current) => ({
+        ...current,
+        title: draft.title || topic,
+        type: "mixed",
+        tags: draft.tags || [],
+        blocks: draft.blocks?.length ? draft.blocks : [{ type: "text", content: "", language: "", meta: {} }]
+      }));
+      setExcerpt(draft.excerpt || "");
+      setEditorVersion((version) => version + 1);
+      flash("AI draft generated. Give it your final pass before publishing.");
+    } catch (err) {
+      flash(getErrorMessage(err), "error");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   const StatusBar = status.msg ? (
     <span className={`nt-status-msg nt-status-${status.type}`}>{status.msg}</span>
   ) : null;
@@ -253,8 +292,24 @@ export default function ItemEditorPage() {
           placeholder="Add tags (comma separated)…"
         />
 
+        <div className="ai-draft-bar">
+          <div className="ai-draft-copy">
+            <Sparkles size={18} />
+            <span>Use the page heading as the topic and create a first draft.</span>
+          </div>
+          <button
+            className="nt-btn-primary"
+            type="button"
+            onClick={generateDraft}
+            disabled={generating || saving || publishing}
+          >
+            <Sparkles size={16} />
+            {generating ? "Generating..." : "Generate draft"}
+          </button>
+        </div>
+
         <NotionEditor
-          key={item._id || "new"}
+          key={`${item._id || "new"}-${editorVersion}`}
           blocks={item.blocks || []}
           onChange={(blocks) => setItem((p) => ({ ...p, blocks }))}
         />

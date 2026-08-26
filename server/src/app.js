@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { connectDB } from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import folderRoutes from "./routes/folderRoutes.js";
@@ -11,7 +12,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.get("/api/health", async (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/posts", postRoutes);

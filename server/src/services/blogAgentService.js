@@ -6,14 +6,21 @@ import { markdownToBlocks } from "../utils/markdownToBlocks.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const projectEnvPath = path.resolve(__dirname, "../../../Project1/.env");
+const envPaths = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "server/.env"),
+  path.resolve(process.cwd(), "Project1/.env"),
+  path.resolve(__dirname, "../../.env"),
+  path.resolve(__dirname, "../../../.env"),
+  path.resolve(__dirname, "../../../Project1/.env")
+];
 
-dotenv.config({ path: projectEnvPath, override: false, quiet: true });
+dotenv.config({ quiet: true });
 
-function loadLooseProjectEnv() {
-  if (!fs.existsSync(projectEnvPath)) return;
+function loadLooseEnvFile(envPath) {
+  if (!fs.existsSync(envPath)) return false;
 
-  const contents = fs.readFileSync(projectEnvPath, "utf8");
+  const contents = fs.readFileSync(envPath, "utf8");
   for (const line of contents.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
@@ -26,14 +33,33 @@ function loadLooseProjectEnv() {
     const value = rawValue.replace(/^["']|["']$/g, "");
     if (key && process.env[key] === undefined) process.env[key] = value;
   }
+  return true;
 }
 
-loadLooseProjectEnv();
+function loadAgentEnv() {
+  for (const envPath of envPaths) {
+    dotenv.config({ path: envPath, override: false, quiet: true });
+    loadLooseEnvFile(envPath);
+  }
+}
+
+loadAgentEnv();
 
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
 function getApiKey() {
   return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
+}
+
+export function getBlogAgentEnvStatus() {
+  return {
+    hasGeminiKey: Boolean(getApiKey()),
+    model: getModel(),
+    checkedEnvFiles: [...new Set(envPaths)].map((envPath) => ({
+      path: envPath,
+      exists: fs.existsSync(envPath)
+    }))
+  };
 }
 
 function getModel() {
@@ -55,7 +81,12 @@ function extractText(data) {
 async function callGemini(prompt) {
   const apiKey = getApiKey();
   if (!apiKey) {
-    const error = new Error("Gemini API key is missing. Add GEMINI_API_KEY to Project1/.env or server environment variables.");
+    const status = getBlogAgentEnvStatus();
+    const checked = status.checkedEnvFiles
+      .filter((file) => file.exists)
+      .map((file) => file.path)
+      .join(", ");
+    const error = new Error(`Gemini API key is missing. Add GEMINI_API_KEY to server/.env, Project1/.env, or server environment variables. Checked existing files: ${checked || "none"}`);
     error.status = 500;
     throw error;
   }

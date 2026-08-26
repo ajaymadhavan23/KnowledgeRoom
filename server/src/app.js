@@ -11,6 +11,7 @@ import itemRoutes from "./routes/itemRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { getBlogAgentEnvStatus } from "./services/blogAgentService.js";
 
 dotenv.config({ quiet: true });
 
@@ -42,6 +43,7 @@ app.get("/api/health", async (_req, res) => {
       db: "connected",
       hasMongoUri: Boolean(process.env.MONGODB_URI),
       hasJwtSecret: Boolean(process.env.JWT_ACCESS_SECRET),
+      hasGeminiKey: getBlogAgentEnvStatus().hasGeminiKey,
     });
   } catch (err) {
     res.status(500).json({
@@ -49,6 +51,7 @@ app.get("/api/health", async (_req, res) => {
       message: err.message,
       hasMongoUri: Boolean(process.env.MONGODB_URI),
       hasJwtSecret: Boolean(process.env.JWT_ACCESS_SECRET),
+      hasGeminiKey: getBlogAgentEnvStatus().hasGeminiKey,
     });
   }
 });

@@ -166,13 +166,14 @@ Logged-in author context:
 
 Return ONLY valid JSON with this exact shape:
 {
-  "title": "A polished article title",
+  "title": "Short title — 2 to 5 words MAX, no subtitle or colon",
   "excerpt": "One short feed preview under 180 characters",
   "tags": ["tag-one", "tag-two"],
   "markdown": "# Title\\n\\nIntro...\\n\\n## Section..."
 }
 
 Markdown rules:
+- Title rule: MUST be 2 to 5 words, no colon, no subtitle (e.g. "JWT Auth Explained", "React State Deep Dive").
 - Include one H1 title, a short intro, 4 to 6 H2 sections, and a conclusion.
 - Include bullet lists where useful.
 - Include concise fenced code blocks only when they genuinely help.

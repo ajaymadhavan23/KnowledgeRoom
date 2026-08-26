@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { markdownToBlocks } from "../utils/markdownToBlocks.js";
@@ -8,6 +9,26 @@ const __dirname = path.dirname(__filename);
 const projectEnvPath = path.resolve(__dirname, "../../../Project1/.env");
 
 dotenv.config({ path: projectEnvPath, override: false, quiet: true });
+
+function loadLooseProjectEnv() {
+  if (!fs.existsSync(projectEnvPath)) return;
+
+  const contents = fs.readFileSync(projectEnvPath, "utf8");
+  for (const line of contents.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const separatorIndex = trimmed.indexOf("=");
+    if (separatorIndex === -1) continue;
+
+    const key = trimmed.slice(0, separatorIndex).trim();
+    const rawValue = trimmed.slice(separatorIndex + 1).trim();
+    const value = rawValue.replace(/^["']|["']$/g, "");
+    if (key && process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+loadLooseProjectEnv();
 
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 

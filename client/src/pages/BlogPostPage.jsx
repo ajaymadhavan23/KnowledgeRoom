@@ -54,7 +54,7 @@ export default function BlogPostPage() {
   return (
     <>
       <PageHeader eyebrow="Blog post" title={post.title}>
-        <button className="ghost" onClick={() => navigate(-1)}><ArrowLeft size={16} /> Back</button>
+        <button className="back-nav-btn" onClick={() => navigate(-1)}><ArrowLeft size={15} /> Back</button>
         <button className="ghost" onClick={like}><Heart size={16} /> {post.likes?.length || 0}</button>
         {/* Hide Save button for own post or if already saved */}
         {!isOwnPost && !hasSaved && (

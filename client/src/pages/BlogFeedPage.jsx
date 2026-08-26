@@ -49,13 +49,19 @@ export default function BlogFeedPage() {
   return (
     <>
       <PageHeader eyebrow="Company knowledge" title="Blog Feed" />
-      <div className="toolbar">
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="latest">Latest</option>
-          <option value="top">Most liked</option>
-          <option value="mostViewed">Most viewed</option>
+      <div className="blog-toolbar">
+        <select
+          className="blog-sort-select"
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
+          <option value="latest">🕒 Latest</option>
+          <option value="top">❤️ Most liked</option>
+          <option value="mostViewed">👁 Most viewed</option>
         </select>
-        <TagFilter value={tag} onChange={setTag} />
+        <div className="blog-tag-filter">
+          <TagFilter value={tag} onChange={setTag} placeholder="🏷 Filter by tag…" />
+        </div>
       </div>
       {message && <p className={message.includes("✓") ? "success" : "error"}>{message}</p>}
       <div className="feed-list">

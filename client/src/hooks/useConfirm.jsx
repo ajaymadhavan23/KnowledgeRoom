@@ -8,6 +8,7 @@
  */
 import { AlertTriangle, CircleHelp } from "lucide-react";
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export function useConfirm() {
   const [dialog, setDialog] = useState(null);
@@ -26,16 +27,21 @@ export function useConfirm() {
     resolveRef.current = null;
   }
 
-  const confirmDialog = dialog ? (
-    <ConfirmModal
-      title={dialog.title}
-      message={dialog.message}
-      confirmText={dialog.confirmText}
-      danger={dialog.danger}
-      onConfirm={() => handleResponse(true)}
-      onCancel={() => handleResponse(false)}
-    />
-  ) : null;
+  // Always portal to body so backdrop-filter / transform stacking contexts
+  // on parent elements can never clip or misplace the modal.
+  const confirmDialog = dialog
+    ? createPortal(
+        <ConfirmModal
+          title={dialog.title}
+          message={dialog.message}
+          confirmText={dialog.confirmText}
+          danger={dialog.danger}
+          onConfirm={() => handleResponse(true)}
+          onCancel={() => handleResponse(false)}
+        />,
+        document.body
+      )
+    : null;
 
   return { confirm, confirmDialog };
 }

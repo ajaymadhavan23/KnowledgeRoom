@@ -1855,6 +1855,62 @@ h3 {
 }
 
 /* ══════════════════════════════════════
+   ITEM CARD — INLINE DELETE CONFIRM
+══════════════════════════════════════ */
+.card-confirm {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  justify-content: center;
+  min-height: 160px;
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.card-confirm-icon {
+  align-items: center;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 50%;
+  color: #dc2626;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.card-confirm-msg {
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.card-confirm-msg strong {
+  color: #0f172a;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.card-confirm-msg span {
+  color: #94a3b8;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.card-confirm-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ══════════════════════════════════════
    BACK NAVIGATION BUTTON
 ══════════════════════════════════════ */
 .back-nav-btn {

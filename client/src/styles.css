@@ -2173,3 +2173,122 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Sharper UI radius pass */
+button,
+.button,
+input,
+textarea,
+select,
+.nt-btn-primary,
+.nt-btn-ghost,
+.modal-btn-cancel,
+.modal-btn-confirm,
+.settings-save-btn {
+  border-radius: 8px;
+}
+
+.app-frame {
+  gap: 18px;
+  padding: 12px;
+}
+
+.sidebar {
+  border-radius: 12px;
+  height: calc(100vh - 24px);
+  top: 12px;
+}
+
+.brand,
+.auth-panel,
+.sidebar-user-card,
+.header-actions,
+.toolbar,
+.search-box,
+.comment-form,
+.blog-toolbar,
+.empty-state,
+.loading-state,
+.notion-topbar,
+.notion-publish-bar,
+.ai-draft-bar,
+.settings-avatar-card,
+.avatar-upload-area,
+.modal-box {
+  border-radius: 10px;
+}
+
+.panel,
+.item-card,
+.post-card,
+.comment,
+.notification,
+.metric,
+.table-row,
+.adm-kpi,
+.adm-card {
+  border-radius: 8px;
+}
+
+.sidebar nav a,
+.tree-row,
+.ne-block-wrap,
+.ne-type-btn,
+.ne-delete-btn,
+.ne-add-btn,
+.ne-url-row,
+.ne-callout-wrap,
+.rendered-callout,
+.ne-link-preview,
+.rendered-link,
+.ne-slash-menu,
+.ne-slash-item,
+.saved-from-banner,
+.error,
+.success,
+.form-error-banner,
+.nt-status-msg,
+.nt-success,
+.blog-sort-select,
+.field-wrap input,
+.field-wrap textarea,
+.field-wrap select {
+  border-radius: 8px;
+}
+
+.brand-mark,
+.avatar,
+.notification-icon {
+  border-radius: 9px;
+}
+
+.tag-row span,
+.notion-tag,
+.status-chip,
+.sidebar-user-role,
+.adm-status,
+.back-nav-btn {
+  border-radius: 7px;
+}
+
+.ne-code-wrap,
+.rendered-pre,
+.rendered-blocks pre,
+.rendered-img,
+.rendered-blocks img,
+.ne-image-preview {
+  border-radius: 8px;
+}
+
+.card-confirm-icon,
+.avatar-preview-ring,
+.avatar-upload-overlay {
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .sidebar,
+  .auth-panel {
+    border-radius: 12px;
+  }
+}

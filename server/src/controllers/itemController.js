@@ -1,4 +1,5 @@
 import { BlogPost } from "../models/BlogPost.js";
+import { Comment } from "../models/Comment.js";
 import { Item } from "../models/Item.js";
 import { Notification } from "../models/Notification.js";
 import { User } from "../models/User.js";
@@ -110,6 +111,14 @@ export async function deleteItem(req, res, next) {
   try {
     const item = await Item.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
     if (!item) return res.status(404).json({ message: "Item not found" });
+
+    // Cascade-delete the published BlogPost + its comments & notifications
+    if (item.publishedPostId) {
+      await BlogPost.findByIdAndDelete(item.publishedPostId);
+      await Comment.deleteMany({ post: item.publishedPostId });
+      await Notification.deleteMany({ post: item.publishedPostId });
+    }
+
     res.json({ message: "Item deleted" });
   } catch (error) {
     next(error);

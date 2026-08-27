@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket, Sparkles } from "lucide-react";
+import { ArrowLeft, Bookmark, Edit3, ExternalLink, FileText, Rocket, Sparkles, Trash2 } from "lucide-react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import NotionEditor from "../components/editor/NotionEditor.jsx";
 import LoadingState from "../components/shared/LoadingState.jsx";
 import { generateBlogDraft } from "../services/aiService.js";
 import { getErrorMessage } from "../services/api.js";
-import { createItem, fetchItem, publishItem, updateItem } from "../services/itemService.js";
+import { createItem, deleteItem, fetchItem, publishItem, updateItem } from "../services/itemService.js";
 
 const blank = {
   title: "Untitled",
@@ -32,6 +32,8 @@ export default function ItemEditorPage() {
   const [stylePreset, setStylePreset] = useState("");          // "" | "Brief" | "Detailed" | "Simple" | "Story-style"
   const [styleCustom, setStyleCustom] = useState("");          // free-text override
   const [loading, setLoading] = useState(Boolean(id));
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -162,6 +164,23 @@ export default function ItemEditorPage() {
     }
   }
 
+  /* ────────────────────────────────────────────────────────
+   * DELETE — removes the note and its published blog post
+   * ──────────────────────────────────────────────────────── */
+  async function handleDelete() {
+    if (!id || deleting) return;
+    setDeleting(true);
+    try {
+      await deleteItem(id);
+      flash("Note deleted");
+      setTimeout(() => navigate("/space", { replace: true }), 400);
+    } catch (err) {
+      flash(err?.response?.data?.message || "Delete failed", "error");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
+
   const StatusBar = status.msg ? (
     <span className={`nt-status-msg nt-status-${status.type}`}>{status.msg}</span>
   ) : null;
@@ -218,10 +237,32 @@ export default function ItemEditorPage() {
             >
               {item.isPublished ? <><Rocket size={16} /> Re-publish</> : <><Rocket size={16} /> Publish</>}
             </button>
+            {id && (
+              <button className="nt-btn-danger" onClick={() => setConfirmDelete(true)} disabled={deleting}>
+                <Trash2 size={16} /> Delete
+              </button>
+            )}
           </div>
         </div>
 
         {PublishPanel}
+
+        {/* ── Delete confirmation overlay ── */}
+        {confirmDelete && (
+          <div className="notion-confirm-bar">
+            <span className="notion-confirm-msg">
+              Delete <strong>&ldquo;{item.title || "Untitled"}&rdquo;</strong>?
+              {item.isPublished && <> This will also remove the published blog post.</>}
+              <em> This cannot be undone.</em>
+            </span>
+            <div className="notion-confirm-actions">
+              <button className="nt-btn-ghost" onClick={() => setConfirmDelete(false)} disabled={deleting}>Cancel</button>
+              <button className="nt-btn-danger" onClick={handleDelete} disabled={deleting}>
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="notion-doc">
           <h1 className="notion-page-title">{item.title || "Untitled"}</h1>
@@ -273,6 +314,11 @@ export default function ItemEditorPage() {
           >
             {item.isPublished ? <><Rocket size={16} /> Re-publish</> : <><Rocket size={16} /> Publish</>}
           </button>
+          {id && (
+            <button className="nt-btn-danger" onClick={() => setConfirmDelete(true)} disabled={deleting}>
+              <Trash2 size={16} /> Delete
+            </button>
+          )}
           <button
             className="nt-btn-primary"
             onClick={() => save()}
@@ -284,6 +330,23 @@ export default function ItemEditorPage() {
       </div>
 
       {PublishPanel}
+
+      {/* ── Delete confirmation overlay ── */}
+      {confirmDelete && (
+        <div className="notion-confirm-bar">
+          <span className="notion-confirm-msg">
+            Delete <strong>&ldquo;{item.title || "Untitled"}&rdquo;</strong>?
+            {item.isPublished && <> This will also remove the published blog post.</>}
+            <em> This cannot be undone.</em>
+          </span>
+          <div className="notion-confirm-actions">
+            <button className="nt-btn-ghost" onClick={() => setConfirmDelete(false)} disabled={deleting}>Cancel</button>
+            <button className="nt-btn-danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? "Deleting…" : "Yes, delete"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Editable canvas ── */}
       <div className="notion-doc">

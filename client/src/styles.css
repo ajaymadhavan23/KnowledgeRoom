@@ -318,6 +318,55 @@ img.avatar { object-fit: cover; }
 .nt-status-success { background: #edf8f4; color: #0f684f; }
 .nt-status-error { background: #fdf2f2; color: #9f1d12; }
 
+/* Danger / delete button */
+.nt-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid #e5484d;
+  border-radius: 6px;
+  color: #cd2b31;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 34px;
+  padding: 0 14px;
+  transition: background 0.15s, color 0.15s;
+}
+.nt-btn-danger:hover { background: #cd2b31; color: white; }
+.nt-btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Delete confirmation bar */
+.notion-confirm-bar {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  animation: slideConfirm 0.2s ease-out;
+}
+@keyframes slideConfirm {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.notion-confirm-msg {
+  color: #991b1b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.notion-confirm-msg strong { color: #7f1d1d; }
+.notion-confirm-msg em { font-style: italic; opacity: 0.8; }
+.notion-confirm-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* Publish panel */
 .notion-publish-bar {
   background: #f8fbfc;
@@ -1429,6 +1478,7 @@ h3 {
 .adm-card,
 .modal-box,
 .notion-publish-bar,
+.notion-confirm-bar,
 .ne-slash-menu {
   background: var(--surface);
   backdrop-filter: blur(18px);
@@ -1780,7 +1830,8 @@ h3 {
 }
 
 .notion-topbar,
-.notion-publish-bar {
+.notion-publish-bar,
+.notion-confirm-bar {
   border-radius: 20px;
 }
 
@@ -2407,6 +2458,7 @@ textarea,
 select,
 .nt-btn-primary,
 .nt-btn-ghost,
+.nt-btn-danger,
 .modal-btn-cancel,
 .modal-btn-confirm,
 .settings-save-btn {
@@ -2436,6 +2488,7 @@ select,
 .loading-state,
 .notion-topbar,
 .notion-publish-bar,
+.notion-confirm-bar,
 .ai-draft-bar,
 .settings-avatar-card,
 .avatar-upload-area,

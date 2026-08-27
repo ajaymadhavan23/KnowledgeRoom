@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SlidersHorizontal, X } from "lucide-react";
 import PostCard from "../components/blog/PostCard.jsx";
 import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
@@ -41,19 +42,37 @@ export default function SearchPage() {
   return (
     <>
       <PageHeader eyebrow="Discovery" title="Search" />
-      <div className="toolbar"><SearchBar value={q} onChange={setQ} placeholder="Search private items and public posts" /><TagFilter value={tag} onChange={setTag} /></div>
+      <div className="search-command-bar">
+        <SearchBar value={q} onChange={setQ} placeholder="Search notes, code, links, and posts" />
+        <label className="search-filter-box">
+          <SlidersHorizontal size={17} />
+          <TagFilter value={tag} onChange={setTag} placeholder="Filter tag" />
+        </label>
+        {(q || tag) && (
+          <button className="search-clear-btn" type="button" onClick={() => { setQ(""); setTag(""); }}>
+            <X size={15} /> Clear
+          </button>
+        )}
+      </div>
       {message && <p className="error">{message}</p>}
       {loading ? (
         <LoadingState label="Searching..." />
       ) : (
-        <>
-          <h2>Personal items</h2>
+        <div className="search-results-layout">
+          <div className="search-section-heading">
+            <h2>Personal items</h2>
+            <span>{items.length} result{items.length !== 1 ? "s" : ""}</span>
+          </div>
           <div className="grid-list">{items.map((item) => <ItemCard key={item._id} item={item} />)}</div>
           {!items.length && <p className="muted">No matching personal items.</p>}
-          <h2>Public posts</h2>
+
+          <div className="search-section-heading">
+            <h2>Public posts</h2>
+            <span>{posts.length} result{posts.length !== 1 ? "s" : ""}</span>
+          </div>
           <div className="feed-list">{posts.map((post) => <PostCard key={post._id} post={post} />)}</div>
           {!posts.length && <p className="muted">No matching public posts.</p>}
-        </>
+        </div>
       )}
     </>
   );

@@ -142,13 +142,44 @@ function excerptFromBlocks(blocks) {
     .trim();
 }
 
-export async function generateBlogDraft({ topic, user }) {
+export async function generateBlogDraft({ topic, stylePreference, user }) {
   const safeTopic = String(topic || "").trim();
   if (!safeTopic) {
     const error = new Error("Topic is required");
     error.status = 400;
     throw error;
   }
+
+  // ── Build style instructions block ────────────────────────────────────────
+  const PRESET_GUIDES = {
+    Brief:
+      "Keep the post under 450 words total. Use short paragraphs. Include at most one code snippet. Focus only on the essentials — skip detailed explanations and edge-case discussions.",
+    Detailed:
+      "Write a deep, thorough post (aim for 900–1200 words). Include multiple code examples. Explain the 'why', edge cases, and trade-offs. Don't rush through any section.",
+    Simple:
+      "Write for someone who is new to the topic. Avoid jargon; when you must use a technical term, briefly define it. Use analogies and real-world comparisons to clarify concepts.",
+    "Story-style":
+      "Open with a short real-world scenario or problem story (2–3 sentences). Weave narrative context throughout. Make it feel like a lesson learned from experience, not a dry reference.",
+  };
+
+  const preset = stylePreference?.preset;
+  const customInstruction = String(stylePreference?.customInstruction || "").trim().slice(0, 400);
+
+  let styleBlock = "";
+  if (preset || customInstruction) {
+    styleBlock = `
+Style instructions (follow these closely):
+`;
+    if (preset && PRESET_GUIDES[preset]) {
+      styleBlock += `- Preset: "${preset}" — ${PRESET_GUIDES[preset]}
+`;
+    }
+    if (customInstruction) {
+      styleBlock += `- Custom instruction (treat this as an override/addition to any preset above): ${customInstruction}
+`;
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const prompt = `
 You are the Knowledge Room blog agent for a company knowledge-sharing MERN app.
@@ -163,7 +194,7 @@ Audience:
 Logged-in author context:
 - Name: ${user?.name || "Employee"}
 - Department: ${user?.department || "General"}
-
+${styleBlock}
 Return ONLY valid JSON with this exact shape:
 {
   "title": "Short title — 2 to 5 words MAX, no subtitle or colon",
@@ -177,7 +208,7 @@ Markdown rules:
 - Include one H1 title, a short intro, 4 to 6 H2 sections, and a conclusion.
 - Include bullet lists where useful.
 - Include concise fenced code blocks only when they genuinely help.
-- Keep the complete draft around 700 to 1100 words.
+- Default draft length is 700–1100 words unless the style instructions above specify otherwise.
 `;
 
   const firstPass = await callGemini(prompt);

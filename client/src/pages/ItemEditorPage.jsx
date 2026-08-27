@@ -29,6 +29,8 @@ export default function ItemEditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [editorVersion, setEditorVersion] = useState(0);
+  const [stylePreset, setStylePreset] = useState("");          // "" | "Brief" | "Detailed" | "Simple" | "Story-style"
+  const [styleCustom, setStyleCustom] = useState("");          // free-text override
   const [loading, setLoading] = useState(Boolean(id));
 
   useEffect(() => {
@@ -138,7 +140,11 @@ export default function ItemEditorPage() {
 
     setGenerating(true);
     try {
-      const draft = await generateBlogDraft({ topic });
+      const stylePreference = {
+        preset: stylePreset || null,
+        customInstruction: styleCustom.trim() || null,
+      };
+      const draft = await generateBlogDraft({ topic, stylePreference });
       setItem((current) => ({
         ...current,
         title: draft.title || topic,
@@ -302,19 +308,55 @@ export default function ItemEditorPage() {
         />
 
         <div className="ai-draft-bar">
-          <div className="ai-draft-copy">
-            <Sparkles size={18} />
-            <span>Use the page heading as the topic and create a first draft.</span>
+          <div className="ai-draft-header">
+            <Sparkles size={17} />
+            <span>AI Draft — use the title as topic and generate a first draft.</span>
           </div>
-          <button
-            className="nt-btn-primary"
-            type="button"
-            onClick={generateDraft}
-            disabled={generating || saving || publishing}
-          >
-            <Sparkles size={16} />
-            {generating ? "Generating..." : "Generate draft"}
-          </button>
+
+          {/* ── Style preset chips ── */}
+          <div className="ai-style-presets">
+            {["Brief", "Detailed", "Simple", "Story-style"].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                className={`ai-style-chip${stylePreset === preset ? " active" : ""}`}
+                onClick={() => setStylePreset((p) => (p === preset ? "" : preset))}
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+
+          {/* ── Custom instruction ── */}
+          <textarea
+            className="ai-style-custom"
+            rows={2}
+            value={styleCustom}
+            onChange={(e) => setStyleCustom(e.target.value)}
+            placeholder={`Or tell me exactly how you want it written… e.g. "explain it like I'm a junior dev, avoid jargon"`}
+            maxLength={400}
+          />
+
+          <div className="ai-draft-actions">
+            {(stylePreset || styleCustom.trim()) && (
+              <button
+                type="button"
+                className="ai-clear-style"
+                onClick={() => { setStylePreset(""); setStyleCustom(""); }}
+              >
+                Clear style
+              </button>
+            )}
+            <button
+              className="nt-btn-primary"
+              type="button"
+              onClick={generateDraft}
+              disabled={generating || saving || publishing}
+            >
+              <Sparkles size={16} />
+              {generating ? "Generating..." : "Generate draft"}
+            </button>
+          </div>
         </div>
 
         <NotionEditor

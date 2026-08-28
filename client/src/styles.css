@@ -168,25 +168,60 @@ h3 { font-size: 1.05rem; margin-bottom: 8px; }
 .tag-row { flex-wrap: wrap; }
 .tag-row span { background: #eaf5f3; border-radius: 999px; color: #0f766e; font-size: 0.84rem; font-weight: 800; padding: 6px 9px; }
 .tree { display: grid; gap: 4px; margin-top: 16px; }
-.tree-row { align-items: center; border-radius: 8px; color: #344854; display: flex; gap: 8px; padding: 9px 10px; }
-.tree-row.active, .tree-row:hover { background: #edf4f6; }
+/* .tree-row is the shared base — visual treatment (border/bg) is on the wrapper or the row itself */
+.tree-row {
+  align-items: center;
+  border-radius: 10px;
+  color: #334155;
+  display: flex;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.tree-row.active, .tree-row:hover {
+  background: rgba(240, 253, 249, 0.9);
+  color: #0f766e;
+}
 
-/* Folder tree row with delete button */
-.tree-row-wrap { align-items: center; border-radius: 8px; display: flex; gap: 0; position: relative; }
+/* Folder tree branch rows — wrapper owns all card-like styling */
+.tree-row-wrap {
+  align-items: stretch;
+  border-radius: 10px;
+  display: flex;
+  gap: 0;
+  position: relative;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+/* Hover/active on the WRAP — not on the inner link — so delete btn reveal works cleanly */
+.tree-row-wrap:hover,
+.tree-row-wrap:has(.tree-row-link.active) {
+  background: rgba(240, 253, 249, 0.9);
+}
 .tree-row-wrap:hover .tree-delete-btn { opacity: 1; }
-.tree-row-link { flex: 1; border-radius: 8px; }
+/* Inner link: transparent, no own border */
+.tree-row-link {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  flex: 1;
+  transition: color 160ms ease;
+}
+.tree-row-link.active,
+.tree-row-wrap:hover .tree-row-link { color: #0f766e; }
 .tree-delete-btn {
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: 6px;
+  border-radius: 7px;
   color: #94a3b8;
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
-  min-height: 30px;
+  min-height: 36px;
   opacity: 0;
-  padding: 0 7px;
+  padding: 0 8px;
   transition: opacity 0.15s, color 0.15s, background 0.15s;
 }
 .tree-delete-btn:hover { background: #fce8e6; color: #b42318; }
@@ -1603,24 +1638,37 @@ h3 {
 }
 
 .tree {
-  gap: 8px;
+  gap: 6px;
 }
 
+/* .tree-row base styles are already defined in the base section above */
+/* Override only what the premium theme needs to add */
 .tree-row {
-  background: rgba(255, 255, 255, 0.42);
-  border: 1px solid transparent;
-  border-radius: 14px;
-  color: #334155;
-  min-height: 40px;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  background: transparent;
+  border: none;
 }
 
 .tree-row.active,
 .tree-row:hover {
   background: rgba(240, 253, 249, 0.9);
-  border-color: rgba(20, 184, 166, 0.2);
+  border: none;
   color: var(--primary);
-  transform: translateX(2px);
+  transform: none;
+}
+
+/* Card-like visual on the wrapper (branches) and bare .tree-row (root) */
+.tree-row-wrap,
+.tree > .tree-row {
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(20, 184, 166, 0.12);
+  border-radius: 10px;
+}
+.tree-row-wrap:hover,
+.tree > .tree-row:hover,
+.tree-row-wrap:has(.active),
+.tree > .tree-row.active {
+  background: rgba(240, 253, 249, 0.9);
+  border-color: rgba(20, 184, 166, 0.28);
 }
 
 .search-box {

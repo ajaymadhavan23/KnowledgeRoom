@@ -4,8 +4,8 @@ import { NavLink } from "react-router-dom";
 function Branch({ folder, depth = 0, onDelete }) {
   const path = folder.isSystemFolder ? "/space/saved" : `/space/folder/${folder._id}`;
   return (
-    <div>
-      <div className="tree-row-wrap" style={{ paddingLeft: 10 + depth * 18 }}>
+    <div style={depth > 0 ? { paddingLeft: depth * 16 } : undefined}>
+      <div className="tree-row-wrap">
         <NavLink className="tree-row tree-row-link" to={path}>
           <ChevronRight size={14} />
           <Folder size={16} />
@@ -40,4 +40,3 @@ export default function FolderTree({ tree = [], onDelete }) {
     </div>
   );
 }
-

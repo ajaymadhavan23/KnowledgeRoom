@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import ItemCard from "../components/space/ItemCard.jsx";
+import { useConfirm } from "../hooks/useConfirm.jsx";
 import { deleteFolder } from "../services/folderService.js";
 import { deleteItem, fetchItems } from "../services/itemService.js";
 
@@ -13,8 +14,8 @@ export default function FolderPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+
+  const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => {
     let active = true;
@@ -32,46 +33,32 @@ export default function FolderPage() {
   }
 
   async function handleDeleteFolder() {
-    setDeleting(true);
+    const ok = await confirm({
+      title: "Delete this folder?",
+      message:
+        "All items inside (including published posts) will be permanently removed. Saved copies in others' spaces will remain.",
+      confirmText: "Yes, delete everything",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteFolder(folderId);
       navigate("/space");
     } catch (err) {
       setMessage(err?.response?.data?.message || "Could not delete folder.");
-      setConfirmingDelete(false);
-    } finally {
-      setDeleting(false);
     }
   }
 
   return (
     <>
+      {confirmDialog}
       <PageHeader eyebrow="Folder" title="Folder view">
         <button className="ghost" onClick={() => navigate(-1)}><ArrowLeft size={16} /> Back</button>
         <Link className="button" to={`/items/new?folder=${folderId}`}>New item here</Link>
-        <button className="danger" onClick={() => setConfirmingDelete(true)}>
+        <button className="danger" onClick={handleDeleteFolder}>
           <Trash2 size={16} /> Delete Folder
         </button>
       </PageHeader>
-
-      {/* ── Folder delete confirmation banner ── */}
-      {confirmingDelete && (
-        <div className="folder-delete-confirm">
-          <AlertTriangle size={20} />
-          <span>
-            <strong>Delete this folder?</strong> All items inside (including published posts) will be permanently removed.
-            Saved copies in others&apos; spaces will remain.
-          </span>
-          <div className="folder-delete-confirm-actions">
-            <button className="small ghost" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
-              Cancel
-            </button>
-            <button className="small danger" onClick={handleDeleteFolder} disabled={deleting}>
-              {deleting ? "Deleting…" : "Yes, delete everything"}
-            </button>
-          </div>
-        </div>
-      )}
 
       {message && <p className="error">{message}</p>}
       {loading ? (

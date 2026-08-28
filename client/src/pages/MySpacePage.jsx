@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import FolderTree from "../components/space/FolderTree.jsx";
 import ItemCard from "../components/space/ItemCard.jsx";
+import { useConfirm } from "../hooks/useConfirm.jsx";
 import { createFolder, deleteFolder, fetchFolders } from "../services/folderService.js";
 import { deleteItem, fetchRecentItems } from "../services/itemService.js";
 
@@ -15,9 +15,7 @@ export default function MySpacePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  // Folder delete confirmation state
-  const [pendingDelete, setPendingDelete] = useState(null); // { id, name }
-  const [deleting, setDeleting] = useState(false);
+  const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => {
     refresh();
@@ -50,76 +48,48 @@ export default function MySpacePage() {
     setItems((current) => current.filter((item) => item._id !== id));
   }
 
-  function requestFolderDelete(id, name) {
-    setPendingDelete({ id, name });
-  }
-
-  async function confirmFolderDelete() {
-    if (!pendingDelete) return;
-    setDeleting(true);
+  async function requestFolderDelete(id, name) {
+    const ok = await confirm({
+      title: `Delete "${name}"?`,
+      message:
+        "All items inside this folder (including any sub-folders and their published posts) will be permanently deleted. Saved copies in other users' spaces will remain.",
+      confirmText: "Yes, delete everything",
+      danger: true,
+    });
+    if (!ok) return;
     try {
-      await deleteFolder(pendingDelete.id);
-      setPendingDelete(null);
+      await deleteFolder(id);
       refresh();
     } catch (err) {
       setMessage(err?.response?.data?.message || "Could not delete folder.");
-      setPendingDelete(null);
-    } finally {
-      setDeleting(false);
     }
   }
 
   return (
     <>
+      {confirmDialog}
       <PageHeader eyebrow="Private workspace" title="My Space">
         <Link className="button" to="/items/new">New item</Link>
       </PageHeader>
-
-      {/* ── Folder delete modal ── */}
-      {pendingDelete && (
-        <div className="modal-overlay" onClick={() => !deleting && setPendingDelete(null)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon danger">
-              <AlertTriangle size={28} />
-            </div>
-            <h3>Delete &ldquo;{pendingDelete.name}&rdquo;?</h3>
-            <p>
-              All items inside this folder (including any sub-folders and their published posts)
-              will be <strong>permanently deleted</strong>. Saved copies in other users&apos; spaces
-              will remain.
-            </p>
-            <div className="modal-actions">
-              <button className="ghost" onClick={() => setPendingDelete(null)} disabled={deleting}>
-                Cancel
-              </button>
-              <button className="danger" onClick={confirmFolderDelete} disabled={deleting}>
-                {deleting ? "Deleting…" : "Yes, delete everything"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {message && <p className="error">{message}</p>}
       {loading ? (
         <LoadingState label="Loading your space..." />
       ) : (
-      <div className="two-column">
-        <section className="panel">
-          <h2>Folders</h2>
-          <form className="inline-form" onSubmit={addFolder}>
-            <input value={folderName} onChange={(e) => setFolderName(e.target.value)} placeholder="New folder" />
-            <button>Add</button>
-          </form>
-          <FolderTree tree={folders.tree} onDelete={requestFolderDelete} />
-        </section>
-        <section>
-          <h2>Continue where you left off</h2>
-          <div className="grid-list">{items.map((item) => <ItemCard key={item._id} item={item} onDelete={removeItem} />)}</div>
-        </section>
-      </div>
+        <div className="two-column">
+          <section className="panel">
+            <h2>Folders</h2>
+            <form className="inline-form" onSubmit={addFolder}>
+              <input value={folderName} onChange={(e) => setFolderName(e.target.value)} placeholder="New folder" />
+              <button>Add</button>
+            </form>
+            <FolderTree tree={folders.tree} onDelete={requestFolderDelete} />
+          </section>
+          <section>
+            <h2>Continue where you left off</h2>
+            <div className="grid-list">{items.map((item) => <ItemCard key={item._id} item={item} onDelete={removeItem} />)}</div>
+          </section>
+        </div>
       )}
     </>
   );
 }
-

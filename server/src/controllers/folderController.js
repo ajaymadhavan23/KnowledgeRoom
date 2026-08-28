@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
+import { BlogPost } from "../models/BlogPost.js";
+import { Comment } from "../models/Comment.js";
 import { Folder } from "../models/Folder.js";
 import { Item } from "../models/Item.js";
+import { Notification } from "../models/Notification.js";
 import { buildFolderTree } from "../utils/folders.js";
 
 export async function getFolders(req, res, next) {
@@ -41,21 +44,77 @@ export async function updateFolder(req, res, next) {
   }
 }
 
+/**
+ * Recursively collect the IDs of a folder and all its descendant sub-folders
+ * that are owned by the given user.
+ */
+async function collectDescendantFolderIds(rootId, ownerId) {
+  const allIds = [rootId];
+  const queue = [rootId];
+
+  while (queue.length) {
+    const parentId = queue.shift();
+    const children = await Folder.find(
+      { owner: ownerId, parentFolder: parentId },
+      { _id: 1 }
+    ).lean();
+
+    for (const child of children) {
+      allIds.push(child._id);
+      queue.push(child._id);
+    }
+  }
+
+  return allIds;
+}
+
 export async function deleteFolder(req, res, next) {
   const session = await mongoose.startSession();
   try {
-    let folder;
+    let found = false;
+
     await session.withTransaction(async () => {
-      folder = await Folder.findOne({ _id: req.params.id, owner: req.user._id }).session(session);
+      const folder = await Folder.findOne(
+        { _id: req.params.id, owner: req.user._id },
+        null,
+        { session }
+      );
       if (!folder) return;
       if (folder.isSystemFolder) throw new Error("System folder cannot be deleted");
+      found = true;
 
-      await Item.updateMany({ owner: req.user._id, folder: folder._id }, { folder: null }).session(session);
-      await Folder.updateMany({ owner: req.user._id, parentFolder: folder._id }, { parentFolder: null }).session(session);
-      await Folder.deleteOne({ _id: folder._id }).session(session);
+      // ── 1. Collect this folder + all nested sub-folders ───────────────────
+      const folderIds = await collectDescendantFolderIds(folder._id, req.user._id);
+
+      // ── 2. Find every item that lives inside any of those folders ──────────
+      const items = await Item.find(
+        { owner: req.user._id, folder: { $in: folderIds } },
+        { _id: 1, publishedPostId: 1 },
+        { session }
+      ).lean();
+
+      const publishedPostIds = items
+        .map((i) => i.publishedPostId)
+        .filter(Boolean);
+
+      // ── 3. Cascade-delete published blog posts + their comments/notifs ─────
+      if (publishedPostIds.length) {
+        await BlogPost.deleteMany({ _id: { $in: publishedPostIds } }).session(session);
+        await Comment.deleteMany({ post: { $in: publishedPostIds } }).session(session);
+        await Notification.deleteMany({ post: { $in: publishedPostIds } }).session(session);
+      }
+
+      // ── 4. Delete all items that belonged to these folders ─────────────────
+      const itemIds = items.map((i) => i._id);
+      if (itemIds.length) {
+        await Item.deleteMany({ _id: { $in: itemIds } }).session(session);
+      }
+
+      // ── 5. Delete all the folders (root + descendants) ────────────────────
+      await Folder.deleteMany({ _id: { $in: folderIds } }).session(session);
     });
 
-    if (!folder) return res.status(404).json({ message: "Folder not found" });
+    if (!found) return res.status(404).json({ message: "Folder not found" });
     res.json({ message: "Folder deleted" });
   } catch (error) {
     next(error);

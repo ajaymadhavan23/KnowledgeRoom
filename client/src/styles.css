@@ -170,6 +170,71 @@ h3 { font-size: 1.05rem; margin-bottom: 8px; }
 .tree { display: grid; gap: 4px; margin-top: 16px; }
 .tree-row { align-items: center; border-radius: 8px; color: #344854; display: flex; gap: 8px; padding: 9px 10px; }
 .tree-row.active, .tree-row:hover { background: #edf4f6; }
+
+/* Folder tree row with delete button */
+.tree-row-wrap { align-items: center; border-radius: 8px; display: flex; gap: 0; position: relative; }
+.tree-row-wrap:hover .tree-delete-btn { opacity: 1; }
+.tree-row-link { flex: 1; border-radius: 8px; }
+.tree-delete-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  min-height: 30px;
+  opacity: 0;
+  padding: 0 7px;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.tree-delete-btn:hover { background: #fce8e6; color: #b42318; }
+
+/* Folder delete confirmation banner (in FolderPage header) */
+.folder-delete-confirm {
+  align-items: flex-start;
+  background: #fff8f7;
+  border: 1.5px solid #fca5a5;
+  border-radius: 12px;
+  color: #7f1d1d;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+}
+.folder-delete-confirm > svg { color: #dc2626; flex-shrink: 0; margin-top: 2px; }
+.folder-delete-confirm > span { flex: 1; font-size: 0.95rem; line-height: 1.5; min-width: 200px; }
+.folder-delete-confirm-actions { align-items: center; display: flex; gap: 10px; width: 100%; }
+
+/* Generic modal overlay / dialog */
+.modal-overlay {
+  align-items: center;
+  background: rgba(15, 23, 42, 0.55);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 999;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  display: grid;
+  gap: 14px;
+  max-width: 440px;
+  padding: 28px;
+  width: 90%;
+}
+.modal-icon { align-items: center; border-radius: 12px; display: flex; height: 48px; justify-content: center; margin-bottom: 4px; width: 48px; }
+.modal-icon.danger { background: #fce8e6; color: #b42318; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+
 .search-box { align-items: center; display: flex; gap: 8px; min-width: min(480px, 100%); }
 .search-box input { min-width: 260px; }
 .compact-input { max-width: 220px; }

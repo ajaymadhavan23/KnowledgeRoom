@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BlogPost } from "../models/BlogPost.js";
 import { Comment } from "../models/Comment.js";
 import { Item } from "../models/Item.js";
@@ -146,7 +147,7 @@ export async function publishItem(req, res, next) {
     // Notify all other users that a new post was published
     const allUsers = await User.find(
       { _id: { $ne: req.user._id } },
-      { _id: 1 }
+      { _id: 1, email: 1, name: 1 }
     ).lean();
 
     if (allUsers.length > 0) {
@@ -160,7 +161,22 @@ export async function publishItem(req, res, next) {
       await Notification.insertMany(notifications, { ordered: false });
     }
 
+    // Respond immediately — don't block on the webhook
     res.status(201).json(post);
+
+    // Fire-and-forget: notify n8n to email all users about the new post
+    if (process.env.N8N_WEBHOOK_URL && allUsers.length > 0) {
+      const recipients = allUsers.map((u) => ({ email: u.email, name: u.name }));
+      axios
+        .post(process.env.N8N_WEBHOOK_URL, {
+          postId: post._id.toString(),
+          title: post.title,
+          authorName: req.user.name,
+          postUrl: `${process.env.CLIENT_URL}/blog/${post._id}`,
+          recipients
+        })
+        .catch((err) => console.error("[n8n] Webhook failed:", err.message));
+    }
   } catch (error) {
     next(error);
   }

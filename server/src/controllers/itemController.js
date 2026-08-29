@@ -168,13 +168,21 @@ export async function publishItem(req, res, next) {
     if (process.env.N8N_WEBHOOK_URL && allUsers.length > 0) {
       const recipients = allUsers.map((u) => ({ email: u.email, name: u.name }));
       axios
-        .post(process.env.N8N_WEBHOOK_URL, {
-          postId: post._id.toString(),
-          title: post.title,
-          authorName: req.user.name,
-          postUrl: `${process.env.CLIENT_URL}/blog/${post._id}`,
-          recipients
-        })
+        .post(
+          process.env.N8N_WEBHOOK_URL,
+          {
+            postId: post._id.toString(),
+            title: post.title,
+            authorName: req.user.name,
+            postUrl: `${process.env.CLIENT_URL}/blog/${post._id}`,
+            recipients
+          },
+          {
+            headers: {
+              "Bypass-Tunnel-Reminder": "true"
+            }
+          }
+        )
         .catch((err) => console.error("[n8n] Webhook failed:", err.message));
     }
   } catch (error) {

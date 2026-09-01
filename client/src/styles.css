@@ -2445,6 +2445,12 @@ h3 {
   margin: 0;
 }
 
+.settings-avatar-card .sidebar-user-role {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  border: 1px solid rgba(15, 118, 110, 0.25);
+}
+
 /* Form section */
 .settings-form {
   display: grid;

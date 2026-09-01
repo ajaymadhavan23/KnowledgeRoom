@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Bookmark, Check, Eye, Heart } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import CommentThread from "../components/blog/CommentThread.jsx";
+import SimilarPosts from "../components/blog/SimilarPosts.jsx";
 import BlockRenderer from "../components/editor/BlockRenderer.jsx";
 import Avatar from "../components/shared/Avatar.jsx";
 import LoadingState from "../components/shared/LoadingState.jsx";
@@ -92,6 +93,7 @@ export default function BlogPostPage() {
         <div className="tag-row">{post.tags?.map((tag) => <span key={tag}>#{tag}</span>)}</div>
         <BlockRenderer blocks={post.blocks} />
       </article>
+      <SimilarPosts postId={id} />
       <CommentThread postId={id} />
     </>
   );

@@ -54,3 +54,8 @@ export async function deleteComment(id) {
   const { data } = await api.delete(`/comments/${id}`);
   return data;
 }
+
+export async function fetchSimilarPosts(id) {
+  const { data } = await api.get(`/posts/${id}/similar`);
+  return data;
+}

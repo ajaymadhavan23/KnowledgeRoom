@@ -2646,3 +2646,133 @@ select,
     border-radius: 12px;
   }
 }
+
+/* ── Similar Posts ───────────────────────────────────────────────────────── */
+
+.similar-posts {
+  margin-top: 24px;
+  max-width: 860px;
+}
+
+.similar-posts__title {
+  align-items: center;
+  color: #16202a;
+  display: flex;
+  font-size: 1.05rem;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.similar-posts__title svg {
+  color: #0f766e;
+}
+
+.similar-posts__grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.similar-posts__card {
+  background: white;
+  border: 1px solid #d7e0e5;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(26, 43, 58, 0.05);
+  color: inherit;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.similar-posts__card:hover {
+  border-color: #0f766e;
+  box-shadow: 0 10px 28px rgba(15, 118, 110, 0.12);
+  transform: translateY(-2px);
+}
+
+.similar-posts__card-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.similar-posts__author {
+  color: #647783;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.similar-posts__score {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  border-radius: 999px;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-left: auto;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.similar-posts__card-title {
+  color: #16202a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.similar-posts__excerpt {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #647783;
+  display: -webkit-box;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+}
+
+.similar-posts__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.similar-posts__tag {
+  background: #eaf5f3;
+  border-radius: 999px;
+  color: #0f766e;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 8px;
+}
+
+/* Skeleton loading state */
+.similar-posts__skeleton {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.similar-posts__skeleton-card {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #eef2f5 25%, #dce4e8 50%, #eef2f5 75%);
+  background-size: 200% 100%;
+  border-radius: 10px;
+  height: 140px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 600px) {
+  .similar-posts__grid,
+  .similar-posts__skeleton {
+    grid-template-columns: 1fr;
+  }
+}

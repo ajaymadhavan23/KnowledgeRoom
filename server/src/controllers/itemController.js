@@ -4,6 +4,7 @@ import { Comment } from "../models/Comment.js";
 import { Item } from "../models/Item.js";
 import { Notification } from "../models/Notification.js";
 import { User } from "../models/User.js";
+import { generateEmbeddingForPost } from "../services/embeddingService.js";
 
 function normalizeTags(tags = []) {
   return [...new Set(tags.map((tag) => String(tag).trim()).filter(Boolean))];
@@ -185,6 +186,10 @@ export async function publishItem(req, res, next) {
         )
         .catch((err) => console.error("[n8n] Webhook failed:", err.message));
     }
+
+    // Fire-and-forget: generate vector embedding for semantic search
+    generateEmbeddingForPost(post._id, post.title, post.blocks)
+      .catch((err) => console.error("[embedding] Failed:", err.message));
   } catch (error) {
     next(error);
   }

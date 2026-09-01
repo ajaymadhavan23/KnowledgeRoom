@@ -11,6 +11,10 @@ const blogPostSchema = new mongoose.Schema(
     blocks: { type: [blockSchema], default: [] },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     views: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    embedding: {
+      type: [Number],
+      select: false, // excluded from default queries — it's a 768-float array
+    },
     isActive: { type: Boolean, default: true },
     publishedAt: { type: Date, default: Date.now }
   },

@@ -44,12 +44,15 @@ export function extractTextForEmbedding(title, blocks = []) {
 
 /**
  * Generate a 768-dimensional embedding vector for the given text.
- * Uses Gemini text-embedding-004 model.
+ * Uses Gemini gemini-embedding-001 model.
  */
 export async function generateEmbedding(text) {
   const genAI = getGenAI();
-  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
-  const result = await model.embedContent(text);
+  const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+  const result = await model.embedContent({
+    content: { parts: [{ text }] },
+    outputDimensionality: 768
+  });
   return result.embedding.values; // number[] — 768 floats
 }
 

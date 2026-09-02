@@ -64,9 +64,19 @@ export default function MyPostsPage() {
                 <span>{post.likes?.length || 0} likes</span>
                 <span>{post.views?.length || 0} views</span>
                 <span>{post.commentsCount || 0} comments</span>
-                <span>{post.isActive ? "Active" : "Inactive"}</span>
-                {post.isActive && <button className="small danger" onClick={() => unpublish(post._id, post.title)}>Unpublish</button>}
-                <button className="small danger" onClick={() => handleDelete(post._id, post.title)}>Delete</button>
+                <div className="table-row-actions">
+                  <span className={`status-badge ${post.isActive ? "active" : "inactive"}`}>
+                    {post.isActive ? "Active" : "Inactive"}
+                  </span>
+                  {post.isActive && (
+                    <button className="small danger" onClick={() => unpublish(post._id, post.title)}>
+                      Unpublish
+                    </button>
+                  )}
+                  <button className="small danger outline" onClick={() => handleDelete(post._id, post.title)}>
+                    Delete
+                  </button>
+                </div>
               </article>
             ))}
           </div>

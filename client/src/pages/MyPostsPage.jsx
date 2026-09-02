@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import LoadingState from "../components/shared/LoadingState.jsx";
 import PageHeader from "../components/shared/PageHeader.jsx";
 import { useConfirm } from "../hooks/useConfirm.jsx";
-import { fetchMyPosts, unpublishPost } from "../services/postService.js";
+import { fetchMyPosts, unpublishPost, deletePost } from "../services/postService.js";
 
 export default function MyPostsPage() {
   const [posts, setPosts] = useState([]);
@@ -31,6 +31,21 @@ export default function MyPostsPage() {
     setPosts((current) => current.map((post) => post._id === id ? { ...post, isActive: false } : post));
   }
 
+  async function handleDelete(id, title) {
+    const isConfirmed = await confirm({
+      title: "Delete Post Permanently",
+      message: `This will permanently delete "${title || "this post"}" along with all its likes, comments, and notifications. This cannot be undone.`,
+      danger: true
+    });
+    if (!isConfirmed) return;
+    try {
+      await deletePost(id);
+      setPosts((current) => current.filter((post) => post._id !== id));
+    } catch (err) {
+      setMessage(err?.response?.data?.message || "Could not delete post.");
+    }
+  }
+
   return (
     <>
       <PageHeader eyebrow="Your public work" title="My Published Posts" />
@@ -51,6 +66,7 @@ export default function MyPostsPage() {
                 <span>{post.commentsCount || 0} comments</span>
                 <span>{post.isActive ? "Active" : "Inactive"}</span>
                 {post.isActive && <button className="small danger" onClick={() => unpublish(post._id, post.title)}>Unpublish</button>}
+                <button className="small danger" onClick={() => handleDelete(post._id, post.title)}>Delete</button>
               </article>
             ))}
           </div>

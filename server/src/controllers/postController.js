@@ -166,6 +166,31 @@ export async function unpublishPost(req, res, next) {
   }
 }
 
+export async function deletePost(req, res, next) {
+  try {
+    const post = await BlogPost.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (post.author.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    // Unlink the original Item so the author can re-publish later if they want
+    await Item.updateMany(
+      { publishedPostId: post._id, owner: post.author },
+      { isPublished: false, publishedPostId: null }
+    );
+
+    // Clean up associated data
+    await Comment.deleteMany({ post: post._id });
+    await Notification.deleteMany({ post: post._id });
+    await post.deleteOne();
+
+    res.json({ message: "Post deleted permanently" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getMyPosts(req, res, next) {
   try {
     const posts = await BlogPost.find({ author: req.user._id }).sort({ publishedAt: -1 });

@@ -35,6 +35,11 @@ export async function unpublishPost(id) {
   return data;
 }
 
+export async function deletePost(id) {
+  const { data } = await api.delete(`/posts/${id}`);
+  return data;
+}
+
 export async function fetchMyPosts() {
   const { data } = await api.get("/posts/mine");
   return data;

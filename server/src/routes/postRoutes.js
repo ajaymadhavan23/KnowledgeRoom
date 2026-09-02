@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createComment, getComments } from "../controllers/commentController.js";
 import {
+  deletePost,
   getMyPosts,
   getPost,
   getPosts,
@@ -21,6 +22,7 @@ router.get("/search", searchPosts);
 router.get("/", getPosts);
 router.get("/:id", getPost);
 router.post("/:id/unpublish", unpublishPost);
+router.delete("/:id", deletePost);
 router.post("/:id/like", toggleLike);
 router.post("/:id/view", registerView);
 router.post("/:id/save", savePost);
